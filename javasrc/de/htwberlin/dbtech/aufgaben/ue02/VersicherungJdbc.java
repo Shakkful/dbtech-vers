@@ -11,7 +11,11 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -36,10 +40,23 @@ public class VersicherungJdbc implements IVersicherungJdbc {
 
     @Override
     public List<String> kurzBezProdukte() {
-        L.info("start");
-        L.info("ende");
-        return null;
+        List<String> kurzBez = new LinkedList<>();
+        String sql = "SELECT kurzbez FROM produkt ORDER BY id ASC";
+
+        try (PreparedStatement ps = useConnection().prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                kurzBez.add(rs.getString("kurzbez"));
+            }
+
+        } catch (SQLException ex) {
+            throw new DataException(ex);
+        }
+
+        return kurzBez;
     }
+
 
     @Override
     public Kunde findKundeById(Integer id) {
